@@ -1,0 +1,9 @@
+
+
+Projection: Plate Carree aka Geographic or "LatLong"
+Earth ellipsoid: Sphere, radius 6370997 m
+Datum: WGS84
+Extent: 180 West to 180 East, 90 North to 90 South
+Size: 8,192 height samples wide x 4,096 high
+
+
