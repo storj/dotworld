@@ -1,32 +1,30 @@
 package main
 
-// Hardcoded calculations for:
-//
-//   Projection: Plate Carree aka Geographic or "LatLong"
-//   Earth ellipsoid: Sphere, radius 6370997 m
-//   Extent: 180 West to 180 East, 90 North to 90 South
-//   Size: 8,192 height samples wide x 4,096 high
-
+// S2 defines a LatLong coordinate.
 type S2 struct {
 	Lat  float32
 	Long float32
 }
 
+// P2 defines a pixel coordinate.
 type P2 struct {
 	X float32
 	Y float32
 }
 
+// PlateCarree defines parameters for Plate Carree projection.
 type PlateCarre struct {
 	Width  float32
 	Height float32
 }
 
+// Reference defines the coordinates for default reference image.
 var Reference = PlateCarre{
 	Width:  8192,
 	Height: 4096,
 }
 
+// Forward converts from LatLong to pixel coordinates.
 func (pc *PlateCarre) Forward(s S2) P2 {
 	return P2{
 		X: pc.Width * (s.Long + 180) / 360,
@@ -34,6 +32,7 @@ func (pc *PlateCarre) Forward(s S2) P2 {
 	}
 }
 
+// Reverse converts from pixel coordinates to LatLong.
 func (pc *PlateCarre) Reverse(p P2) S2 {
 	return S2{
 		Long: (p.X/pc.Width)*360 - 180,

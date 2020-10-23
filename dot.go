@@ -4,13 +4,18 @@ import (
 	"image"
 )
 
+// Grid defines arguments for deriving a Map from an image.
 type Grid struct {
-	CountX    int
+	// CountX defines number of dots in X dimension.
+	CountX int
+	// Thshold defines minimum average Y value, where dot should be placed.
 	Threshold float32
 
+	// Coord define image coordinate system.
 	Coord PlateCarre
 }
 
+// MapFromImage derives a Map from an image.
 func (grid *Grid) MapFromImage(m *image.Gray) *Map {
 	b := m.Bounds()
 	tileSize := b.Dx() / grid.CountX
@@ -21,9 +26,9 @@ func (grid *Grid) MapFromImage(m *image.Gray) *Map {
 
 	for tileY0 := b.Min.Y; tileY0 < b.Max.Y; tileY0 += tileSize {
 		dotmap.CountY++
-		tileY1 := MinInt(tileY0+tileSize, b.Max.Y)
+		tileY1 := minInt(tileY0+tileSize, b.Max.Y)
 		for tileX0 := b.Min.X; tileX0 < b.Max.X; tileX0 += tileSize {
-			tileX1 := MinInt(tileX0+tileSize, b.Max.X)
+			tileX1 := minInt(tileX0+tileSize, b.Max.X)
 
 			tileCenter := P2{
 				X: float32(tileX0+tileX1) / 2,
@@ -47,6 +52,7 @@ func (grid *Grid) MapFromImage(m *image.Gray) *Map {
 	return &dotmap
 }
 
+// AvgY calculates average Y (luminosity) for a grayscale image.
 func AvgY(m *image.Gray, b image.Rectangle) float32 {
 	mb := m.Bounds()
 	totalY := int64(0)
@@ -60,7 +66,7 @@ func AvgY(m *image.Gray, b image.Rectangle) float32 {
 	return float32(totalY) / float32(255*b.Dx()*b.Dy())
 }
 
-func MinInt(x, y int) int {
+func minInt(x, y int) int {
 	if x < y {
 		return x
 	}

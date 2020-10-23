@@ -13,14 +13,16 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	rand.Seed(time.Now().UnixNano())
-	if err := run(context.Background(), "reference/world.png"); err != nil {
+	if err := run(ctx, "reference/world.png"); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context, imagepath string) error {
+func run(_ context.Context, imagepath string) error {
 	worlddata, err := ioutil.ReadFile(imagepath)
 	if err != nil {
 		return fmt.Errorf("failed to load %q: %w", imagepath, err)

@@ -5,17 +5,20 @@ import (
 	"io"
 )
 
+// Map defines a location map with dots.
 type Map struct {
 	CountX, CountY int
 	Locations      []Location
 }
 
+// Location defines a location in LatLong coordinates.
 type Location struct {
 	S2
 	Land float32 // 0 to 1
 	Load float32
 }
 
+// EncodeSVG encodes map as a svg.
 func (m *Map) EncodeSVG(w io.Writer, width, height int) (err error) {
 	writef := func(s string, args ...interface{}) {
 		if err != nil {
@@ -35,11 +38,11 @@ func (m *Map) EncodeSVG(w io.Writer, width, height int) (err error) {
 		Height: float32(height),
 	}
 
-	locr := 0.5 * MinF32(
+	locr := 0.5 * minF32(
 		float32(width)/float32(m.CountX),
 		float32(height)/float32(m.CountY),
 	)
-	locr -= 1
+	locr -= 1.0
 
 	plot := func(loc Location) {
 		p := pc.Forward(loc.S2)
@@ -75,7 +78,8 @@ func (m *Map) EncodeSVG(w io.Writer, width, height int) (err error) {
 	return
 }
 
-func MinF32(a, b float32) float32 {
+// minF32 calculates min of floats.
+func minF32(a, b float32) float32 {
 	if a < b {
 		return a
 	}
