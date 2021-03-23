@@ -1,3 +1,6 @@
+// Copyright (C) 2021 Storj Labs, Inc.
+// See LICENSE for copying information.
+
 package main
 
 import (
@@ -11,6 +14,8 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"storj.io/dotworld"
 )
 
 // Config defines arguments for map generation.
@@ -56,7 +61,7 @@ func run(ctx context.Context, command string, config Config) error {
 	}
 }
 
-func generateMap(_ context.Context, config Config) (*Map, error) {
+func generateMap(_ context.Context, config Config) (*dotworld.Map, error) {
 	worlddata, err := ioutil.ReadFile(config.Reference)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load %q: %w", config.Reference, err)
@@ -68,11 +73,11 @@ func generateMap(_ context.Context, config Config) (*Map, error) {
 	}
 	m := rm.(*image.Gray)
 
-	grid := Grid{
+	grid := dotworld.Grid{
 		CountX:    config.GridCountX,
 		Threshold: float32(config.GridThreshold),
 
-		Coord: PlateCarre{
+		Coord: dotworld.PlateCarre{
 			Width:  float32(m.Bounds().Dx()),
 			Height: float32(m.Bounds().Dy()),
 		},
