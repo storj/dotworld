@@ -14,6 +14,15 @@ type Map struct {
 	Locations      []Location
 }
 
+// Copy returns a new Map with the same data
+func (m *Map) Copy() *Map {
+	return &Map{
+		CountX:    m.CountX,
+		CountY:    m.CountY,
+		Locations: append([]Location(nil), m.Locations...),
+	}
+}
+
 // Location defines a location in LatLong coordinates.
 type Location struct {
 	S2
