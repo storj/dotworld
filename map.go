@@ -27,7 +27,8 @@ func (m *Map) Copy() *Map {
 		Locations: make(map[GridPosition]*Location, len(m.Locations)),
 	}
 	for k, v := range m.Locations {
-		copy.Locations[k] = v
+		loc := *v
+		copy.Locations[k] = &loc
 	}
 	return copy
 }
