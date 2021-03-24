@@ -78,7 +78,7 @@ func (m *Map) EncodeSVG(w io.Writer, width, height int) (err error) {
 
 		szf := loc.Land
 		if loc.Load > 0 {
-			szf = 1.5
+			szf = 1.1 + 2*loc.Load
 		}
 
 		sz := locr * szf
