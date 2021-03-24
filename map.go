@@ -1,4 +1,7 @@
-package main
+// Copyright (C) 2020 Storj Labs, Inc.
+// See LICENSE for copying information.
+
+package dotworld
 
 import (
 	"fmt"
@@ -9,6 +12,15 @@ import (
 type Map struct {
 	CountX, CountY int
 	Locations      []Location
+}
+
+// Copy returns a new Map with the same data
+func (m *Map) Copy() *Map {
+	return &Map{
+		CountX:    m.CountX,
+		CountY:    m.CountY,
+		Locations: append([]Location(nil), m.Locations...),
+	}
 }
 
 // Location defines a location in LatLong coordinates.
