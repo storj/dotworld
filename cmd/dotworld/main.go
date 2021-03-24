@@ -99,8 +99,13 @@ func generateRandomMap(ctx context.Context, config Config) error {
 
 	const N = 80
 	for k := 0; k < N; k++ {
-		i := rand.Intn(len(dotmap.Locations))
-		dotmap.Locations[i].Load += 1.0 / N
+		gridPos := dotmap.Lookup(dotworld.S2{
+			Lat:  float32(rand.Intn(180) - 90),
+			Long: float32(rand.Intn(360) - 180),
+		})
+		if nearest := dotmap.Nearest(gridPos); nearest != nil {
+			nearest.Load += 1.0 / N
+		}
 	}
 
 	_ = dotmap.EncodeSVG(os.Stdout, 800, 400)

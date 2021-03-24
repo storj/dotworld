@@ -24,13 +24,18 @@ func (grid *Grid) MapFromImage(m *image.Gray) *Map {
 	tileSize := b.Dx() / grid.CountX
 
 	dotmap := Map{
-		CountX: grid.CountX,
+		CountX:    grid.CountX,
+		Grid:      grid,
+		Bounds:    b,
+		Locations: map[GridPosition]*Location{},
 	}
 
 	for tileY0 := b.Min.Y; tileY0 < b.Max.Y; tileY0 += tileSize {
 		dotmap.CountY++
 		tileY1 := minInt(tileY0+tileSize, b.Max.Y)
+		tileCountX := 0
 		for tileX0 := b.Min.X; tileX0 < b.Max.X; tileX0 += tileSize {
+			tileCountX++
 			tileX1 := minInt(tileX0+tileSize, b.Max.X)
 
 			tileCenter := P2{
@@ -43,10 +48,15 @@ func (grid *Grid) MapFromImage(m *image.Gray) *Map {
 			land := 1 - AvgY(m, tileRect)
 			if land > grid.Threshold {
 
-				dotmap.Locations = append(dotmap.Locations, Location{
+				gridPos := GridPosition{
+					Row: dotmap.CountY - 1,
+					Col: tileCountX - 1,
+				}
+
+				dotmap.Locations[gridPos] = &Location{
 					S2:   center,
 					Land: land,
-				})
+				}
 
 			}
 		}

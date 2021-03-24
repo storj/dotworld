@@ -5,22 +5,38 @@ package dotworld
 
 import (
 	"fmt"
+	"image"
 	"io"
 )
 
 // Map defines a location map with dots.
 type Map struct {
 	CountX, CountY int
-	Locations      []Location
+	Grid           *Grid
+	Bounds         image.Rectangle
+	Locations      map[GridPosition]*Location
 }
 
 // Copy returns a new Map with the same data
 func (m *Map) Copy() *Map {
-	return &Map{
+	copy := &Map{
 		CountX:    m.CountX,
 		CountY:    m.CountY,
-		Locations: append([]Location(nil), m.Locations...),
+		Grid:      m.Grid,
+		Bounds:    m.Bounds,
+		Locations: make(map[GridPosition]*Location, len(m.Locations)),
 	}
+	for k, v := range m.Locations {
+		copy.Locations[k] = v
+	}
+	return copy
+}
+
+// GridPosition represents the integer row and column of a location on a
+// grid.
+type GridPosition struct {
+	Row int
+	Col int
 }
 
 // Location defines a location in LatLong coordinates.
@@ -56,7 +72,7 @@ func (m *Map) EncodeSVG(w io.Writer, width, height int) (err error) {
 	)
 	locr -= 1.0
 
-	plot := func(loc Location) {
+	plot := func(loc *Location) {
 		p := pc.Forward(loc.S2)
 
 		szf := loc.Land
@@ -96,4 +112,49 @@ func minF32(a, b float32) float32 {
 		return a
 	}
 	return b
+}
+
+// Lookup finds the appropriate row and column in the grid for the given S2
+// location.
+func (m *Map) Lookup(pos S2) GridPosition {
+	p2 := m.Grid.Coord.Forward(pos)
+	tileSize := m.Bounds.Dx() / m.Grid.CountX
+	if p2.X > float32(m.Bounds.Max.X) {
+		p2.X = float32(m.Bounds.Max.X)
+	}
+	if p2.Y > float32(m.Bounds.Max.Y) {
+		p2.Y = float32(m.Bounds.Max.Y)
+	}
+	p2.X -= float32(m.Bounds.Min.X)
+	p2.Y -= float32(m.Bounds.Min.Y)
+	return GridPosition{
+		Row: int(p2.Y / float32(tileSize)),
+		Col: int(p2.X / float32(tileSize)),
+	}
+}
+
+// Nearest returns the requested grid position, or a close by neighbor if
+// the requested one isn't found. Returns nil if nothing is found.
+func (m *Map) Nearest(pos GridPosition) *Location {
+	for _, attempt := range []struct {
+		RowDelta int
+		ColDelta int
+	}{
+		{0, 0},
+		{0, 1}, // do columns first, because there is more column fidelity
+		{0, -1},
+		{1, 0},
+		{-1, 0},
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	} {
+		if loc, exists := m.Locations[GridPosition{
+			Row: pos.Row + attempt.RowDelta,
+			Col: pos.Col + attempt.RowDelta}]; exists {
+			return loc
+		}
+	}
+	return nil
 }
